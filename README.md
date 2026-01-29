@@ -2,6 +2,8 @@
 
 A small Node.js/TypeScript service that logs into DigiKabu, pulls timetables and school events, and keeps them in sync with Google Calendar. It creates per-user calendars, shares them to configured Google accounts, and runs scheduled incremental/full syncs.
 
+[![Build and Push Docker Image for Master Branch](https://github.com/Unluckymichell/digikabu-sync-to-google/actions/workflows/docker-image-master.yml/badge.svg)](https://github.com/Unluckymichell/digikabu-sync-to-google/actions/workflows/docker-image-master.yml)
+
 ## Features
 
 - Syncs DigiKabu timetable entries into Google Calendar.
