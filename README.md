@@ -24,6 +24,7 @@ A small Node.js/TypeScript service that logs into DigiKabu, pulls timetables and
 This app is configured via environment variables.
 
 - `GOOGLE_SECRET_FILE`: Absolute or relative path to the Google service account JSON file.
+- `GOOGLE_SECRET_JSON`: The full JSON contents of the Google service account key (takes precedence over `GOOGLE_SECRET_FILE`).
 - `DIGI_GOOLE_SYNCS`: JSON object mapping `"user:password"` to an array of Google emails to share calendars with.
 
 Example:
@@ -31,6 +32,10 @@ Example:
 ```
 GOOGLE_SECRET_FILE=./path/to/google-service-account.json
 DIGI_GOOLE_SYNCS={"user1:pass1":["user1@gmail.com"],"user2:pass2":["user2@gmail.com","other@gmail.com"]}
+
+# or, without mounting a file
+GOOGLE_SECRET_JSON={"type":"service_account","project_id":"...", ...}
+DIGI_GOOLE_SYNCS={"user1:pass1":["user1@gmail.com"]}
 ```
 
 ## Local run
@@ -61,6 +66,15 @@ docker run --rm \
   -e DIGI_GOOLE_SYNCS='{"user:pass":["user@gmail.com"]}' \
   -v /absolute/path/to/google.json:/secrets/google.json:ro \
   digikabu-sync
+
+Or pass the JSON directly (no file mount required):
+
+```
+docker run --rm \
+  -e GOOGLE_SECRET_JSON='{"type":"service_account","project_id":"...", ...}' \
+  -e DIGI_GOOLE_SYNCS='{"user:pass":["user@gmail.com"]}' \
+  digikabu-sync
+```
 ```
 
 ## Security notes

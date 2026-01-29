@@ -15,7 +15,13 @@ async function main() {
 
   // Login google
   const googleCalendarManager = new GoogleCalendarManager();
-  await googleCalendarManager.authenticate(appENV.GOOGLE_SECRET_FILE);
+  if (appENV.GOOGLE_SECRET_JSON) {
+    await googleCalendarManager.authenticateFromJson(appENV.GOOGLE_SECRET_JSON);
+  } else if (appENV.GOOGLE_SECRET_FILE) {
+    await googleCalendarManager.authenticate(appENV.GOOGLE_SECRET_FILE);
+  } else {
+    throw new Error("Missing GOOGLE_SECRET_FILE or GOOGLE_SECRET_JSON");
+  }
 
   // Ensure all calendars exist, pulling out calendar_v3 objects
   const userToCalendarMap: { user_pass: string, cal: calendar_v3.Schema$Calendar, emails: string[] }[] = [];

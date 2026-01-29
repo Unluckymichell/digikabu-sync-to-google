@@ -37,6 +37,28 @@ export class GoogleCalendarManager {
         this.gcal = google.calendar({ version: "v3", auth: this.auth });
     }
 
+    async authenticateFromJson(keyFileJson: string) {
+        let credentials: Record<string, any>;
+        try {
+            credentials = JSON.parse(keyFileJson);
+        } catch (err) {
+            throw "Invalid GOOGLE_SECRET_JSON: " + err;
+        }
+
+        con.log("Authenticating (json)");
+        const auth = new google.auth.GoogleAuth({
+            scopes: this.scopes,
+            credentials
+        });
+
+        this.auth = auth;
+
+        if (!this.auth) throw "Not authenticated"
+
+        con.log("Init google API");
+        this.gcal = google.calendar({ version: "v3", auth: this.auth });
+    }
+
     async enschureCalendar(name: string) {
         if (!this.gcal) throw "Not inititialised";
 

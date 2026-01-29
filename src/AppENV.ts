@@ -7,7 +7,8 @@ type pass = string;
 type email = string;
 
 export class AppENV extends Logging {
-    GOOGLE_SECRET_FILE: string;
+    GOOGLE_SECRET_FILE?: string;
+    GOOGLE_SECRET_JSON?: string;
     DIGI_GOOLE_SYNCS: {[key: `${user}:${pass}`]: email[]}
 
     constructor(public proc: typeof process) {
@@ -15,16 +16,35 @@ export class AppENV extends Logging {
         super("AppENV");
 
         const GOOGLE_SECRET_FILE = proc.env["GOOGLE_SECRET_FILE"];
+        const GOOGLE_SECRET_JSON = proc.env["GOOGLE_SECRET_JSON"];
 
-        if(typeof GOOGLE_SECRET_FILE != "string")
-            throw this.errorAndLeave("Please specify GOOGLE_SECRET_FILE in env");
-        
-        const GOOGLE_SECRET_FILE_RESOLVED = resolve(GOOGLE_SECRET_FILE)
+        if (typeof GOOGLE_SECRET_JSON === "string") {
+            try {
+                const parsed = JSON.parse(GOOGLE_SECRET_JSON);
+                if (typeof parsed !== "object" || !parsed)
+                    throw new Error("GOOGLE_SECRET_JSON must be a JSON object");
+            } catch (err) {
+                throw this.errorAndLeave("JSON error in GOOGLE_SECRET_JSON:\n" + err);
+            }
+            this.GOOGLE_SECRET_JSON = GOOGLE_SECRET_JSON;
+        }
 
-        if(!existsSync(GOOGLE_SECRET_FILE_RESOLVED))
-            throw this.errorAndLeave("GOOGLE_SECRET_FILE does not exist on drive");
+        if (!this.GOOGLE_SECRET_JSON) {
+            if(typeof GOOGLE_SECRET_FILE != "string")
+                throw this.errorAndLeave("Please specify GOOGLE_SECRET_FILE or GOOGLE_SECRET_JSON in env");
+            
+            const GOOGLE_SECRET_FILE_RESOLVED = resolve(GOOGLE_SECRET_FILE)
 
-        this.GOOGLE_SECRET_FILE = GOOGLE_SECRET_FILE_RESOLVED;
+            if(!existsSync(GOOGLE_SECRET_FILE_RESOLVED))
+                throw this.errorAndLeave("GOOGLE_SECRET_FILE does not exist on drive");
+
+            this.GOOGLE_SECRET_FILE = GOOGLE_SECRET_FILE_RESOLVED;
+        } else if (typeof GOOGLE_SECRET_FILE === "string") {
+            const GOOGLE_SECRET_FILE_RESOLVED = resolve(GOOGLE_SECRET_FILE)
+            if(existsSync(GOOGLE_SECRET_FILE_RESOLVED)) {
+                this.GOOGLE_SECRET_FILE = GOOGLE_SECRET_FILE_RESOLVED;
+            }
+        }
 
         const DIGI_GOOLE_SYNCS = proc.env["DIGI_GOOLE_SYNCS"];
 
