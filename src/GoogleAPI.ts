@@ -52,7 +52,7 @@ export class GoogleCalendarManager extends Logging {
     async enschureCalendar(name: string) {
         if (!this.gcal) throw "Not inititialised";
 
-        this.log("enschuring Calendar", name);
+        this.log("Enschuring Calendar exists for", name);
 
         const existingCalendars = await this.gcal.calendarList.list();
         const foundCal = existingCalendars.data.items?.find(
@@ -77,7 +77,7 @@ export class GoogleCalendarManager extends Logging {
         if (!this.gcal) throw "Not inititialised";
         if (!cal.id) throw "Invalid Calendar, no id";
 
-        this.log("enschuring Calendar", cal.summary, " is shared to all users");
+        this.log("Enschuring Calendar", cal.summary, " is shared to all users");
 
         const aclList = await this.gcal.acl.list({ calendarId: cal.id });
         if (aclList.status != 200) throw "Failed to create Calendar";
@@ -87,7 +87,7 @@ export class GoogleCalendarManager extends Logging {
         ));
 
         for (const aue of addToShared) {
-            this.log("> Adding user", aue);
+            this.log("Scharing calendar", cal.summary, "with", aue);
             await this.gcal.acl.insert({
                 calendarId: cal.id,
                 requestBody: {
