@@ -65,7 +65,8 @@ docker run --rm \
   -e GOOGLE_SECRET_FILE=/secrets/google.json \
   -e DIGI_GOOLE_SYNCS='{"user:pass":["user@gmail.com"]}' \
   -v /absolute/path/to/google.json:/secrets/google.json:ro \
-  digikabu-sync
+  ghcr.io/unluckymichell/digikabu-sync-to-google:latest
+```
 
 Or pass the JSON directly (no file mount required):
 
@@ -73,8 +74,7 @@ Or pass the JSON directly (no file mount required):
 docker run --rm \
   -e GOOGLE_SECRET_JSON='{"type":"service_account","project_id":"...", ...}' \
   -e DIGI_GOOLE_SYNCS='{"user:pass":["user@gmail.com"]}' \
-  digikabu-sync
-```
+  ghcr.io/unluckymichell/digikabu-sync-to-google:latest
 ```
 
 ## Security notes
