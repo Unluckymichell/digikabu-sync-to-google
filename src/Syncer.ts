@@ -1,7 +1,6 @@
 import { calendar_v3 } from "googleapis";
 import * as z from "zod";
-import { Z_DigiKabu_PlanEntery } from "./DigiKabuAPI";
-import { DigiKabuAPI } from "./DigiKabuAPI";
+import { DigiKabuAPI, Z_DigiKabu_EventEntery_Array, Z_DigiKabu_PlanEntery_Array } from "./DigiKabuAPI";
 import { GoogleCalendarManager } from "./GoogleAPI";
 import { Logging } from "./Logging";
 
@@ -176,7 +175,7 @@ export class Syncer extends Logging {
     calendarId: string,
     startDate: Date,
     endDate: Date,
-    stundenplan: z.infer<typeof Z_DigiKabu_PlanEntery>[]
+    stundenplan: z.infer<typeof Z_DigiKabu_PlanEntery_Array>
   ): Promise<void> {
     // Hole alle Events dieser Woche aus dem Kalender
 
@@ -236,6 +235,7 @@ export class Syncer extends Logging {
             summary: title,
             start: { dateTime: startIso },
             end: { dateTime: endIso },
+            location: raumLongtext,
             colorId: lehrer ? "10" : "11", // Blau normal, Rot für Entfall
             extendedProperties: { private: { syncKey: key } },
           },
@@ -254,6 +254,7 @@ export class Syncer extends Logging {
             requestBody: {
               summary: title,
               description: notes,
+              location: raumLongtext,
               colorId: lehrer ? "6" : "11", // Orange für Änderung
             },
           });
@@ -283,7 +284,7 @@ export class Syncer extends Logging {
   private async syncTermineToCalendar(
     calendar: calendar_v3.Calendar,
     calendarId: string,
-    termine: any[]
+    termine: z.infer<typeof Z_DigiKabu_EventEntery_Array>
   ): Promise<void> {
     // Bestimme den Datumsbereich aus den Termine-Daten
     let minDate: Date | null = null;
@@ -348,7 +349,7 @@ export class Syncer extends Logging {
             summary: hinweis,
             start: { dateTime: this.toDateTimeIso(startDate, "00:00") },
             end: { dateTime: this.toDateTimeIso(endDate, "00:00") },
-            colorId: "2", // Grün für neue Termine
+            colorId: "11", // Rot für neue Termine
             extendedProperties: { private: { syncKey: key } },
           },
         });
@@ -366,7 +367,7 @@ export class Syncer extends Logging {
             requestBody: {
               summary: hinweis,
               description: notes,
-              colorId: "2", // Grün beibehalten
+              colorId: "11", // Rot beibehalten
             },
           });
           this.log(`Termin aktualisiert: ${hinweis}`);
@@ -412,6 +413,5 @@ export class Syncer extends Logging {
     monday.setHours(0, 0, 0, 0);
     return monday;
   }
-
 
 }
