@@ -14,6 +14,28 @@ A small Node.js/TypeScript service that logs into DigiKabu, pulls timetables and
   - Quick sync every 2 hours between 06:00–18:00 (Mon–Fri).
   - Full sync nightly at 01:00 (Mon–Fri).
 
+## Functionality
+
+### Initial Setup
+On startup, the service performs an initial setup for each configured DigiKabu user:
+- Fetches the complete timetable and all events from DigiKabu
+- Creates a dedicated Google Calendar for the user
+- Populates the calendar with the fetched timetable entries and events
+- Automatically shares the calendar with all configured Google email addresses (if not already shared)
+
+### Synchronization Schedules
+After the initial setup, the service maintains calendar data through two synchronization modes:
+
+**Nightly Full Sync** (01:00, Monday–Friday)
+- Fetches the complete timetable for the current and next week
+- Fetches all upcoming events
+- Ensures long-term data consistency and catches any missed updates
+
+**Quick Sync** (Every 2 hours, 06:00–18:00, Monday–Friday)
+- Fetches only the timetable for today and tomorrow
+- Provides rapid updates during school hours to reflect any schedule changes
+- Reduces API load while maintaining near-real-time accuracy
+
 ## Requirements
 
 - Node.js 20+ for local runs.
