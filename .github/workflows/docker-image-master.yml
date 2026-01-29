@@ -1,0 +1,29 @@
+name: Build and Push Docker Image for Master Branch
+on:
+  push:
+    branches:
+    - master
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get Version from package.json
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+      - name: Log in to Github Packages
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Image
+        run: |
+          docker build . --tag ghcr.io/unluckymichell/digikabu-sync-to-google:latest --tag ghcr.io/unluckymichell/digikabu-sync-to-google:${{steps.package-version.outputs.current-version}}
+      - name: Push Image as latest and version
+        run: |
+          docker push ghcr.io/unluckymichell/digikabu-sync-to-google:latest

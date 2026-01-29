@@ -1,0 +1,30 @@
+{
+  "name": "stunden_download",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "build/main.js",
+  "scripts": {
+    "start": "node ./build/main.js",
+    "debug": "npx ts-node --inspect ./src/main.ts",
+    "dev": "nodemon --watch ./src ./src/main.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
+    "dotenv": "^17.2.2",
+    "googleapis": "^105.0.0",
+    "jsdom": "^27.0.0",
+    "node-schedule": "^2.1.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node-schedule": "^2.1.8",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
