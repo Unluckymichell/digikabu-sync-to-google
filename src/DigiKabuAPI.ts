@@ -81,7 +81,7 @@ export class DigiKabuAPI extends Logging {
         const result = await this.fetch_post(url, z.string(), {
             userName: this.user,
             password: this.pass,
-        });
+        }, true);
 
         if (result.error) {
             switch (result.error.type) {
@@ -250,13 +250,13 @@ export class DigiKabuAPI extends Logging {
     async fetch_post<
         t extends z.ZodType,
         b extends string | Object
-    >(url: URL, Z_Type: t, body: b): Promise<Result<
+    >(url: URL, Z_Type: t, body: b, noLog = false): Promise<Result<
         z.infer<t>,
         { type: "status", code: number }
         | { type: "json", err: any, rawText: string }
         | { type: "zod", err: any, rawObject: any }
     >> {
-        this.log(`.fetch_post(URL(${url.href}), Z_Type, ${JSON.stringify(body)})`);
+        if (!noLog) this.log(`.fetch_post(URL(${url.href}), Z_Type, ${JSON.stringify(body)})`);
         const headers: { [key: string]: string } = {
             'accept': '*/*',
             'Content-Type': 'text/json',
