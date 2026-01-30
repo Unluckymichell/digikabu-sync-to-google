@@ -152,7 +152,7 @@ export class Syncer extends Logging {
    */
   async syncAll(): Promise<void> {
     this.log("Starting full sync");
-    await this.syncStundenplanWeeks(2);
+    await this.syncStundenplanWeeks(3);
     await this.syncTermine();
     this.log("Full sync completed");
   }

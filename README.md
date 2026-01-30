@@ -27,7 +27,7 @@ On startup, the service performs an initial setup for each configured DigiKabu u
 After the initial setup, the service maintains calendar data through two synchronization modes:
 
 **Nightly Full Sync** (01:00, Monday–Friday)
-- Fetches the complete timetable for the current and next week
+- Fetches the complete timetable for the current and next 2 weeks
 - Fetches all upcoming events
 - Ensures long-term data consistency and catches any missed updates
 
