@@ -198,7 +198,7 @@ export class Syncer extends Logging {
     const existingEvents = res.data.items ?? [];
 
     // Erstelle Index für schnellen Zugriff
-    // Key: stundenplan-datum+anfstd+endstd+gruppe
+    // Key: stundenplan-datum+anfstd+gruppe
     const eventMap = new Map<string, calendar_v3.Schema$Event>();
     for (const ev of existingEvents) {
       const key = ev.extendedProperties?.private?.["syncKey"];
@@ -220,7 +220,7 @@ export class Syncer extends Logging {
       );
 
       const datumStr = `${datum[2]}.${datum[1]}.${datum[0]}`;
-      const key = `stundenplan-${datumStr}_${anfStd}_${endStd}_${gruppe}`;
+      const key = `stundenplan-${datumStr}_${anfStd}_${gruppe}`;
       const title = lehrer
         ? `${uFachBez} - ${lehrer} (${raumLongtext}, ${gruppe})`
         : `ENTFÄLLT ${uFachBez} (${raumLongtext}, ${gruppe})`;
