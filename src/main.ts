@@ -81,7 +81,7 @@ async function main() {
   );
   
   // Run quick syncs every 2 hours from 6am to 6pm Mon-Fri
-  const job1 = schedule.scheduleJob('0 6-18/2 * * 1-5', async () => {
+  const job1 = schedule.scheduleJob('0/30 6-18 * * 1-5', async () => {
     await promiseBatch(
       1, syncers.map(syncer => () => syncer.quickSync())
     );
