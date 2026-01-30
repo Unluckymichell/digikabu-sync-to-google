@@ -10,7 +10,7 @@ import { Logging } from "./Logging";
 const STUNDEN_ZEITEN: Record<number, string> = {
   1: "08:30",
   2: "09:15",
-  [2.5]: "10:00",
+  [2.5]: "10:00", // Small break is ignored in hour numbering
   3: "10:15",
   4: "11:00",
   5: "11:45",
@@ -177,7 +177,16 @@ export class Syncer extends Logging {
     endDate: Date,
     stundenplan: z.infer<typeof Z_DigiKabu_PlanEntery_Array>
   ): Promise<void> {
-    // Hole alle Events dieser Woche aus dem Kalender
+
+    // Stundenplan einträge die die kurze Pause enthalten werden auf zwei Einträge aufgeteilt
+    stundenplan = stundenplan.flatMap((eintrag) => {
+      if (eintrag.anfStd < 2.5 && eintrag.endStd > 2.5) {
+        const firstPart = { ...eintrag, endStd: 2 };
+        const secondPart = { ...eintrag, anfStd: 3 };
+        return [firstPart, secondPart];
+      }
+      return [eintrag];
+    });
 
     // Berechne den Beginn der Woche (Montag 00:00:00)
     const weekStart = new Date(startDate);
@@ -260,8 +269,26 @@ export class Syncer extends Logging {
           });
           this.log(`Termin aktualisiert: ${title}`);
         } else {
-          this.log(`Termin noch in Ordnung: ${title}`);
-        }
+          // Prüfe auf Zeit-/Ort-Änderungen durch Vergleich als Timestamps
+          const existingStartTime = existing.start?.dateTime ? new Date(existing.start.dateTime).getTime() : null;
+          const existingEndTime = existing.end?.dateTime ? new Date(existing.end.dateTime).getTime() : null;
+          const newStartTime = new Date(startIso).getTime();
+          const newEndTime = new Date(endIso).getTime();
+          if (existingStartTime !== newStartTime || existingEndTime !== newEndTime || existing.location !== raumLongtext) {
+            await calendar.events.patch({
+              calendarId,
+              eventId: existing.id!,
+              requestBody: {
+                start: { dateTime: startIso },
+                end: { dateTime: endIso },
+                location: raumLongtext,
+              },
+            });
+            this.log(`Terminzeit/-ort aktualisiert: ${title}`);
+          } else {
+            this.log(`Termin noch in Ordnung: ${title}`);
+          }
+        } 
         eventMap.delete(key); // Markiere als verarbeitet
       }
     }
@@ -330,11 +357,11 @@ export class Syncer extends Logging {
     // Verarbeite Termine
     for (const termin of termine) {
       const { id, datumVon, datumBis, hinweis } = termin;
-      
+
       // Konvertiere [year, month, day] zu Date
       const startDate = new Date(datumVon[0], datumVon[1] - 1, datumVon[2]);
       const endDate = new Date(datumBis[0], datumBis[1] - 1, datumBis[2]);
-      
+
       // Für Ganztagstermine: endDate auf den nächsten Tag setzen
       endDate.setDate(endDate.getDate() + 1);
 
