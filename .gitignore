@@ -1,0 +1,9 @@
+node_modules/
+build/
+.env
+.env.*
+*.log
+bsz-kalender-sync-*.json
+.vscode/
+.DS_Store
+/__get_*

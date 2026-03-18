@@ -1,0 +1,10 @@
+node_modules/
+build/
+.env
+.env.*
+bsz-kalender-sync-*.json
+.vscode/
+.git/
+.gitignore
+.github/
+*.log
