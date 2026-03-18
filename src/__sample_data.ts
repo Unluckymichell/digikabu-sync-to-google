@@ -27,3 +27,4 @@ const week: DigiKabu_Date = [
     ), { encoding: "utf8" });
 })();
 
+
