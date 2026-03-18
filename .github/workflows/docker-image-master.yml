@@ -2,7 +2,7 @@ name: Build and Push Docker Image for Master Branch
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - 'src/**'
 jobs:
