@@ -246,6 +246,7 @@ export class Syncer extends Logging {
             end: { dateTime: endIso },
             location: raumLongtext,
             colorId: lehrer ? "10" : "11", // Blau normal, Rot für Entfall
+            description: `syncKey: ${key}`,
             extendedProperties: { private: { syncKey: key } },
           },
         });
@@ -282,6 +283,7 @@ export class Syncer extends Logging {
                 start: { dateTime: startIso },
                 end: { dateTime: endIso },
                 location: raumLongtext,
+                description: `syncKey: ${key}`,
               },
             });
             this.log(`Terminzeit/-ort aktualisiert: ${title}`);
@@ -378,6 +380,7 @@ export class Syncer extends Logging {
             start: { dateTime: this.toDateTimeIso(startDate, "00:00") },
             end: { dateTime: this.toDateTimeIso(endDate, "00:00") },
             colorId: "11", // Rot für neue Termine
+            description: `syncKey: ${key}`,
             extendedProperties: { private: { syncKey: key } },
           },
         });
