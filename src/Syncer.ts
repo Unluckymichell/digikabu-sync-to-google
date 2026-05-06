@@ -351,13 +351,19 @@ export class Syncer extends Logging {
     // Erstelle Index für schnellen Zugriff
     // Key: termine-{id}-{datumVon}
     // Das Datum muss hier mit einbezogen werden, da es mehrere Termine mit derselben ID geben kann
-    const eventMap = new Map<string, calendar_v3.Schema$Event>();
+    const eventMap = new Map<string, calendar_v3.Schema$Event[]>();
     for (const ev of existingEvents) {
       const key = ev.extendedProperties?.private?.["syncKey"];
-      if (key?.startsWith("termine-")) eventMap.set(key, ev);
+      if (!key?.startsWith("termine-")) continue;
+      const bucket = eventMap.get(key) ?? [];
+      bucket.push(ev);
+      eventMap.set(key, bucket);
     }
 
     // Verarbeite Termine
+    const processedKeys = new Set<string>();
+    let duplicateInputCount = 0;
+
     for (const termin of termine) {
       const { id, datumVon, datumBis, hinweis } = termin;
 
@@ -369,7 +375,15 @@ export class Syncer extends Logging {
       endDate.setDate(endDate.getDate() + 1);
 
       const key = `termine-${id}-${datumVon[0]}${datumVon[1]}${datumVon[2]}`;
-      const existing = eventMap.get(key);
+      if (processedKeys.has(key)) {
+        duplicateInputCount += 1;
+        this.warn(`Duplicate termine entry ignored (syncKey: ${key})`);
+        continue;
+      }
+      processedKeys.add(key);
+
+      const existingList = eventMap.get(key);
+      const existing = existingList?.[0];
 
       if (!existing) {
         // Neuer Termin
@@ -386,6 +400,18 @@ export class Syncer extends Logging {
         });
         this.log(`Neuer Termin erstellt: ${hinweis}`);
       } else {
+        if (existingList && existingList.length > 1) {
+          for (const duplicate of existingList.slice(1)) {
+            if (duplicate.id) {
+              await calendar.events.delete({
+                calendarId,
+                eventId: duplicate.id,
+              });
+              this.warn(`Duplicate termine event removed: ${duplicate.summary}`);
+            }
+          }
+        }
+
         // Termin existiert bereits -> prüfe auf Änderungen
         const oldTitle = existing.summary ?? "";
         if (oldTitle !== hinweis) {
@@ -410,16 +436,21 @@ export class Syncer extends Logging {
     }
 
     // Lösche Events, die keinen Eintrag mehr haben
-    for (const remainingEv of Array.from(eventMap.values())) {
-      if (remainingEv.id) {
-        await calendar.events.delete({
-          calendarId,
-          eventId: remainingEv.id,
-        });
-        this.log(`Verwaisten Termin gelöscht: ${remainingEv.summary}`);
+    for (const remainingList of Array.from(eventMap.values())) {
+      for (const remainingEv of remainingList) {
+        if (remainingEv.id) {
+          await calendar.events.delete({
+            calendarId,
+            eventId: remainingEv.id,
+          });
+          this.log(`Verwaisten Termin gelöscht: ${remainingEv.summary}`);
+        }
       }
     }
 
+    if (duplicateInputCount > 0) {
+      this.warn(`Ignored ${duplicateInputCount} duplicate termine entries from API`);
+    }
     this.log(`Successfully synced ${termine.length} termine to calendar`);
   }
 
