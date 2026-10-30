@@ -65,7 +65,7 @@ export class AppENV extends Logging {
             if(!digiLogin.match(/.+:.+/)) throw this.errorAndLeave("Error in DIGI_GOOLE_SYNCS:\n" + "Key has to match user:password");
             if(!Array.isArray(googleEmails)) throw this.errorAndLeave("Error in DIGI_GOOLE_SYNCS:\n" + "Values need to bee arrays of google emails as strings");
             if(!googleEmails.every(v => typeof v == "string")) throw this.errorAndLeave("Error in DIGI_GOOLE_SYNCS:\n" + "Values need to bee arrays of google emails as strings");
-            if(!googleEmails.every(v => v.match(/[a-zA-Z0-9]+(@gmail\.com)|(@googlemail\.com)/))) throw this.errorAndLeave("Error in DIGI_GOOLE_SYNCS:\n" + "Values need to bee arrays of google emails as strings!\n Emails need to be gmail.com or googlemail.com");
+            if(!googleEmails.every(v => v.match(/[a-zA-Z0-9]+@.+\..+/))) throw this.errorAndLeave("Error in DIGI_GOOLE_SYNCS:\n" + "Values need to bee arrays of google emails as strings!\n Emails need to be gmail.com or googlemail.com");
         });
 
         this.DIGI_GOOLE_SYNCS = DIGI_GOOLE_SYNCS_PARSED;
